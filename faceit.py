@@ -225,17 +225,27 @@ class FaceIt:
         # Load model
         model_name = "Original"
         converter_name = "Masked"
+
+        use_gan = True
+        print('use_gan', use_gan)
         if use_gan:
             model_name = "GAN"
-            converter_name = "GAN"
-        model = PluginLoader.get_model(model_name)(Path(self._model_path(use_gan)))
+            converter_name = "Masked"
+            trainer_name = "GAN"
+
+
+        model = PluginLoader.get_model(model_name)(Path(self._model_path(use_gan)), 1)
         if not model.load(swap_model):
             print('model Not Found! A valid model must be provided to continue!')
             exit(1)
 
         # Load converter
         converter = PluginLoader.get_converter(converter_name)
+        trainer = PluginLoader.get_trainer(trainer_name)
+        print("converter", converter)
+        print("model", model)
         converter = converter(model.converter(False),
+                              trainer,
                               blur_size=8,
                               seamless_clone=True,
                               mask_type="facehullandrect",
@@ -245,9 +255,14 @@ class FaceIt:
 
         # Load face filter
         filter_person = self._person_a
+        swap_person = self._person_b
         if swap_model:
             filter_person = self._person_b
-        filter = FaceFilter(self._people[filter_person]['faces'])
+        print("###filter_person", filter_person)
+        print("###swap_person", swap_person)
+        print("###", self._people)
+        filter = FaceFilter(self._people[filter_person]['faces'],
+                            self._people[swap_person]['faces'])
 
         # Define conversion method per frame
         def _convert_frame(frame, convert_colors = True):
@@ -255,7 +270,7 @@ class FaceIt:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # Swap RGB to BGR to work with OpenCV
             for face in detect_faces(frame, "cnn"):
                 if (not face_filter) or (face_filter and filter.check(face)):
-                    frame = converter.patch_image(frame, face)
+                    frame = converter.patch_image(frame, face, 64)
                     frame = frame.astype(numpy.float32)
             if convert_colors:                    
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # Swap RGB to BGR to work with OpenCV
@@ -345,11 +360,14 @@ class FaceSwapInterface:
 
 if __name__ == '__main__':
     faceit = FaceIt('fallon_to_oliver', 'fallon', 'oliver')
+    """
     faceit.add_video('oliver', 'oliver_trumpcard.mp4', 'https://www.youtube.com/watch?v=JlxQ3IUWT0I')
     faceit.add_video('oliver', 'oliver_taxreform.mp4', 'https://www.youtube.com/watch?v=g23w7WPSaU8')
     faceit.add_video('oliver', 'oliver_zazu.mp4', 'https://www.youtube.com/watch?v=Y0IUPwXSQqg')
     faceit.add_video('oliver', 'oliver_pastor.mp4', 'https://www.youtube.com/watch?v=mUndxpbufkg')
+    """
     faceit.add_video('oliver', 'oliver_cookie.mp4', 'https://www.youtube.com/watch?v=H916EVndP_A')
+    """
     faceit.add_video('oliver', 'oliver_lorelai.mp4', 'https://www.youtube.com/watch?v=G1xP2f1_1Jg')
     faceit.add_video('fallon', 'fallon_mom.mp4', 'https://www.youtube.com/watch?v=gjXrm2Q-te4')
     faceit.add_video('fallon', 'fallon_charlottesville.mp4', 'https://www.youtube.com/watch?v=E9TJsw67OmE')
@@ -358,7 +376,9 @@ if __name__ == '__main__':
     faceit.add_video('fallon', 'fallon_sesamestreet.mp4', 'https://www.youtube.com/watch?v=SHogg7pJI_M')
     faceit.add_video('fallon', 'fallon_emmastone.mp4', 'https://www.youtube.com/watch?v=bLBSoC_2IY8')
     faceit.add_video('fallon', 'fallon_xfinity.mp4', 'https://www.youtube.com/watch?v=7JwBBZRLgkM')
+    """
     faceit.add_video('fallon', 'fallon_bank.mp4', 'https://www.youtube.com/watch?v=q-0hmYHWVgE')
+
     FaceIt.add_model(faceit)
 
     parser = argparse.ArgumentParser()

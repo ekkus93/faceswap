@@ -9,7 +9,10 @@
 !lib
 !scripts
 !plugins
-data
+data*
 models
+input
+output
+
 
 
