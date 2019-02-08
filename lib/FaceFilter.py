@@ -8,7 +8,9 @@ def avg(arr):
 
 class FaceFilter():
     def __init__(self, reference_file_paths, nreference_file_paths, threshold = 0.6):
-        images = list(map(face_recognition.load_image_file, reference_file_paths))
+        print("###face_recognition.load_image_file: ", face_recognition.load_image_file)
+        print("###reference_file_paths: ", reference_file_paths)
+        images = list(map(face_recognition.load_image_file, reference_file_paths, ))
         nimages = list(map(face_recognition.load_image_file, nreference_file_paths))
         # Note: we take only first face, so the reference file should only contain one face.
         self.encodings = list(map(lambda im: face_recognition.face_encodings(im)[0], images))

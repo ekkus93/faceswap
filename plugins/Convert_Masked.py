@@ -28,7 +28,8 @@ class Convert():
 
         mat = numpy.array(get_align_mat(face_detected, size, should_align_eyes=False)).reshape(2,3)
 
-        if "GAN" not in self.trainer:
+        print("###trainer: ", self.trainer)
+        if "GAN" not in str(self.trainer):
             mat = mat * size
         else:
             padding = int(48/256*size)
@@ -47,17 +48,17 @@ class Convert():
 
         cv2.warpAffine( new_face, mat, image_size, new_image, cv2.WARP_INVERSE_MAP | cv2.INTER_CUBIC, cv2.BORDER_TRANSPARENT )
         
-        if "bsharpen" in self.sharpen_image:
+        if self.sharpen_image is not None and "bsharpen" in self.sharpen_image:
             # Sharpening using filter2D
             kernel = numpy.ones((3, 3)) * (-1)
             kernel[1, 1] = 9
             new_image = cv2.filter2D(new_image, -1, kernel)
-        elif "gsharpen" in self.sharpen_image:
+        elif self.sharpen_image is not None and "gsharpen" in self.sharpen_image:
             # Sharpening using Weighted Method
             gaussain_blur = cv2.GaussianBlur(new_image, (0, 0), 3.0)
             new_image = cv2.addWeighted(
                 new_image, 1.5, gaussain_blur, -0.5, 0, new_image)
-        elif "none" in self.sharpen_image:
+        elif self.sharpen_image is not None and "none" in self.sharpen_image:
             pass
 
         outimage = None
@@ -127,14 +128,14 @@ class Convert():
         new_face = None
         mask = None
 
-        if "GAN" not in self.trainer:
+        if "GAN" not in str(self.trainer):
             normalized_face = face / 255.0
             new_face = self.encoder(normalized_face)[0]
             new_face = numpy.clip( new_face * 255, 0, 255 ).astype( image.dtype )
         else:
             normalized_face = face / 255.0 * 2 - 1
             fake_output = self.encoder(normalized_face)
-            if "128" in self.trainer: # TODO: Another hack to switch between 64 and 128
+            if "128" in str(self.trainer): # TODO: Another hack to switch between 64 and 128
                 fake_output = fake_output[0]
             mask = fake_output[:,:,:, :1]
             new_face = fake_output[:,:,:, 1:]

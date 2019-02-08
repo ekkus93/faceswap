@@ -243,6 +243,8 @@ class FaceIt:
             exit(1)
 
         # Load converter
+        print("###converter_name:", converter_name)
+        print("###trainer_name:", trainer_name)
         converter = PluginLoader.get_converter(converter_name)
         trainer = PluginLoader.get_trainer(trainer_name)
         print("converter", converter)
@@ -261,11 +263,11 @@ class FaceIt:
         swap_person = self._person_b
         if swap_model:
             filter_person = self._person_b
-        print("###filter_person", filter_person)
-        print("###swap_person", swap_person)
-        print("###", self._people)
-        filter = FaceFilter(self._people[filter_person]['faces'],
-                            self._people[swap_person]['faces'])
+        print("###self._people[filter_person]['faces']", self._people[filter_person]['faces'])
+        print("###self._people[swap_person]['faces']", self._people[swap_person]['faces'])
+
+        filter = FaceFilter([self._people[filter_person]['faces']],
+                            [self._people[swap_person]['faces']])
 
         # Define conversion method per frame
         def _convert_frame(frame, convert_colors = True):
@@ -273,6 +275,8 @@ class FaceIt:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # Swap RGB to BGR to work with OpenCV
             for face in detect_faces(frame, "cnn"):
                 if (not face_filter) or (face_filter and filter.check(face)):
+                    print("###frame: ", frame)
+                    print("###face: ", face)
                     frame = converter.patch_image(frame, face, 64)
                     frame = frame.astype(numpy.float32)
             if convert_colors:                    
@@ -419,6 +423,15 @@ if __name__ == '__main__':
         if not args.video:
             print('Need a video to convert. Some ideas: {}'.format(", ".join([video['name'] for video in faceit.all_videos()])))
         else:
+            print("###args.video: ", args.video)
+            print("###args.video: ", args.duration)
+            print("###args.swap_model: ", args.swap_model)
+            print("###args.face_filter: ", args.face_filter)
+            print("###args.start_time: ", args.start_time)
+            print("###args.photos: ", args.photos)
+            print("###args.crop_x: ", args.crop_x)
+            print("###args.width: ", args.width)
+            print("###args.side_by_side: ", args.side_by_side)
             faceit.convert(args.video, duration = args.duration, swap_model = args.swap_model, face_filter = args.face_filter, start_time = args.start_time, photos = args.photos, crop_x = args.crop_x, width = args.width, side_by_side = args.side_by_side)
 
 
