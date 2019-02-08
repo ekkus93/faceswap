@@ -308,7 +308,9 @@ class FaceIt:
             # Stack clips side by side
             if side_by_side:
                 def add_caption(caption, clip):
-                    text = (TextClip(caption, font='Amiri-regular', color='white', fontsize=80).
+                    print("###fonts: ", TextClip.list('font'))
+                    #text = (TextClip(caption, font='Amiri-regular', color='white', fontsize=80).
+                    text = (TextClip(caption, font='Century-Schoolbook-L-Roman', color='white', fontsize=80).
                             margin(40).
                             set_duration(clip.duration).
                             on_color(color=(0,0,0), col_opacity=0.6))
