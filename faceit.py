@@ -64,6 +64,7 @@ class FaceIt:
         self._people[person]['photos'].append(photo_dir)
             
     def add_video(self, person, name, url=None, fps=20):
+        print("###url: %s" % url)
         self._people[person]['videos'].append({
             'name' : name,
             'url' : url,
@@ -116,13 +117,15 @@ class FaceIt:
             'merge_output_format' : 'mp4'
         }
         with youtube_dl.YoutubeDL(options) as ydl:
+            print("###url: %s" % video['url'])
             x = ydl.download([video['url']])
 
     def _fix_video_name(self, file_name):
         file_name = file_name.replace("\\", "/")
         file_name_parts = file_name.split(".")
         print("###file_name_parts:", file_name_parts)
-        search_file_name = file_name_parts[0] + '.*.' + file_name_parts[1]
+        #search_file_name = file_name_parts[0] + '.*.' + file_name_parts[1]
+        search_file_name = file_name_parts[0] + '*' + file_name_parts[1]
         print("###search_file_name:", search_file_name)
 
         return glob(search_file_name)[0]
@@ -350,25 +353,35 @@ class FaceSwapInterface:
         train = TrainingProcessor(
             self._subparser, "train", "This command trains the model for the two faces A and B.")
         args_str = "train --input-A {} --input-B {} --model-dir {} --trainer {} --batch-size {} --write-image"
-        args_str = args_str.format(input_a_dir, input_b_dir, model_dir, model_type, 512)
+        #args_str = args_str.format(input_a_dir, input_b_dir, model_dir, model_type, 512)
+        args_str = args_str.format(input_a_dir, input_b_dir, model_dir, model_type, 32)
         self._run_script(args_str)
 
     def _run_script(self, args_str):
+        print("###_run_script: %s" % args_str)
         args = self._parser.parse_args(args_str.split(' '))
         args.func(args)
 
 
 if __name__ == '__main__':
     faceit = FaceIt('fallon_to_oliver', 'fallon', 'oliver')
-    """
-    faceit.add_video('oliver', 'oliver_trumpcard.mp4', 'https://www.youtube.com/watch?v=JlxQ3IUWT0I')
-    faceit.add_video('oliver', 'oliver_taxreform.mp4', 'https://www.youtube.com/watch?v=g23w7WPSaU8')
-    faceit.add_video('oliver', 'oliver_zazu.mp4', 'https://www.youtube.com/watch?v=Y0IUPwXSQqg')
-    faceit.add_video('oliver', 'oliver_pastor.mp4', 'https://www.youtube.com/watch?v=mUndxpbufkg')
-    """
+
+    faceit.add_video('oliver', 'oliver1.mp4', 'https://youtu.be/OmLMOlsUaSc')
+    faceit.add_video('oliver', 'oliver2.mp4', 'https://youtu.be/XXCbffp7jLM')
+    faceit.add_video('oliver', 'oliver3.mp4', 'https://youtu.be/gwf-XK8zal8')
+    faceit.add_video('oliver', 'oliver4.mp4', 'https://youtu.be/64tUYDacfPs')
+    faceit.add_video('oliver', 'oliver5.mp4', 'https://youtu.be/hBq7939MlFI')
+    faceit.add_video('oliver', 'oliver6.mp4', 'https://youtu.be/iE6fHnSn2z4')
+    faceit.add_video('oliver', 'oliver7.mp4', 'https://youtu.be/wU13Bjlqusk')
+    faceit.add_video('oliver', 'oliver8.mp4', 'https://youtu.be/PFvxdkHkElU')
+    
     faceit.add_video('oliver', 'oliver_cookie.mp4', 'https://www.youtube.com/watch?v=H916EVndP_A')
-    """
     faceit.add_video('oliver', 'oliver_lorelai.mp4', 'https://www.youtube.com/watch?v=G1xP2f1_1Jg')
+
+    faceit.add_video('fallon', 'fallon1.mp4', 'https://youtu.be/9SBWt55Zr4Y')
+    faceit.add_video('fallon', 'fallon2.mp4', 'https://youtu.be/3Ll_yhTuAiM')
+    faceit.add_video('fallon', 'fallon3.mp4', 'https://youtu.be/F-GXxG2zg80')
+    
     faceit.add_video('fallon', 'fallon_mom.mp4', 'https://www.youtube.com/watch?v=gjXrm2Q-te4')
     faceit.add_video('fallon', 'fallon_charlottesville.mp4', 'https://www.youtube.com/watch?v=E9TJsw67OmE')
     faceit.add_video('fallon', 'fallon_dakota.mp4', 'https://www.youtube.com/watch?v=tPtMP_NAMz0')
@@ -376,8 +389,9 @@ if __name__ == '__main__':
     faceit.add_video('fallon', 'fallon_sesamestreet.mp4', 'https://www.youtube.com/watch?v=SHogg7pJI_M')
     faceit.add_video('fallon', 'fallon_emmastone.mp4', 'https://www.youtube.com/watch?v=bLBSoC_2IY8')
     faceit.add_video('fallon', 'fallon_xfinity.mp4', 'https://www.youtube.com/watch?v=7JwBBZRLgkM')
-    """
-    faceit.add_video('fallon', 'fallon_bank.mp4', 'https://www.youtube.com/watch?v=q-0hmYHWVgE')
+
+    # bad videoxoxo
+    #faceit.add_video('fallon', 'fallon_bank.mp4', 'https://www.youtube.com/watch?v=q-0hmYHWVgE')
 
     FaceIt.add_model(faceit)
 
