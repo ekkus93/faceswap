@@ -275,8 +275,8 @@ class FaceIt:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # Swap RGB to BGR to work with OpenCV
             for face in detect_faces(frame, "cnn"):
                 if (not face_filter) or (face_filter and filter.check(face)):
-                    print("###frame: ", frame)
-                    print("###face: ", face)
+                    #print("###frame: ", frame)
+                    #print("###face: ", face)
                     frame = converter.patch_image(frame, face, 64)
                     frame = frame.astype(numpy.float32)
             if convert_colors:                    

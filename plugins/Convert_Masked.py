@@ -28,7 +28,7 @@ class Convert():
 
         mat = numpy.array(get_align_mat(face_detected, size, should_align_eyes=False)).reshape(2,3)
 
-        print("###trainer: ", self.trainer)
+        #print("###trainer: ", self.trainer)
         if "GAN" not in str(self.trainer):
             mat = mat * size
         else:
